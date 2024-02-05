@@ -1,0 +1,748 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>handler: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">app/internal/handler/vehicle.go (93.7%)</option>
+				
+				<option value="file1">app/internal/repository/mock_repository.go (100.0%)</option>
+				
+				<option value="file2">app/internal/repository/vehicle_map.go (100.0%)</option>
+				
+				<option value="file3">app/internal/service/mock_service.go (100.0%)</option>
+				
+				<option value="file4">app/internal/service/vehicle_default.go (100.0%)</option>
+				
+				<option value="file5">app/platform/web/request/json.go (100.0%)</option>
+				
+				<option value="file6">app/platform/web/response/error.go (0.0%)</option>
+				
+				<option value="file7">app/platform/web/response/error_gin.go (81.8%)</option>
+				
+				<option value="file8">app/platform/web/response/json.go (100.0%)</option>
+				
+				<option value="file9">app/platform/web/response/json_gin.go (60.0%)</option>
+				
+				<option value="file10">app/platform/web/response/text.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package handler
+
+import (
+        "app/internal"
+        "app/platform/web/response"
+        "errors"
+        "net/http"
+        "strconv"
+
+        "github.com/gin-gonic/gin"
+)
+
+// HandlerVehicle is a struct with methods that represent handlers for vehicles
+type HandlerVehicle struct {
+        // sv is the service that will be used by the handler
+        sv internal.ServiceVehicle
+}
+
+// NewHandlerVehicle is a function that returns a new instance of HandlerVehicle
+func NewHandlerVehicle(sv internal.ServiceVehicle) *HandlerVehicle <span class="cov8" title="1">{
+        return &amp;HandlerVehicle{sv: sv}
+}</span>
+
+// FindByColorAndYear returns a handler that returns a map of vehicles that match the color and fabrication year
+func (h *HandlerVehicle) FindByColorAndYear() gin.HandlerFunc <span class="cov8" title="1">{
+        return func(ctx *gin.Context) </span><span class="cov8" title="1">{
+                // request
+                color := ctx.Param("color")
+                year, err := strconv.Atoi(ctx.Param("year"))
+                if err != nil </span><span class="cov8" title="1">{
+                        response.ErrorGin(ctx, http.StatusBadRequest, "invalid year")
+                        return
+                }</span>
+
+                // process
+                <span class="cov8" title="1">v, err := h.sv.FindByColorAndYear(color, year)
+                if err != nil </span><span class="cov8" title="1">{
+                        response.ErrorGin(ctx, http.StatusInternalServerError, "internal error")
+                        return
+                }</span>
+
+                // response
+                <span class="cov8" title="1">response.JSONGin(ctx, http.StatusOK, map[string]any{
+                        "message": "vehicles found",
+                        "data": v,
+                })</span>
+        }
+}
+
+// FindByBrandAndYearRange returns a handler that returns a map of vehicles that match the brand and a range of fabrication years
+func (h *HandlerVehicle) FindByBrandAndYearRange() gin.HandlerFunc <span class="cov8" title="1">{
+        return func(ctx *gin.Context) </span><span class="cov8" title="1">{
+                // request
+                brand := ctx.Param("brand")
+                startYear, err := strconv.Atoi(ctx.Param("start_year"))
+                if err != nil </span><span class="cov8" title="1">{
+                        response.ErrorGin(ctx, http.StatusBadRequest, "invalid start_year")
+                        return
+                }</span>
+                <span class="cov8" title="1">endYear, err := strconv.Atoi(ctx.Param("end_year"))
+                if err != nil </span><span class="cov8" title="1">{
+                        response.ErrorGin(ctx, http.StatusBadRequest, "invalid end_year")
+                        return
+                }</span>
+
+                // process
+                <span class="cov8" title="1">v, err := h.sv.FindByBrandAndYearRange(brand, startYear, endYear)
+                if err != nil </span><span class="cov8" title="1">{
+                        response.ErrorGin(ctx, http.StatusInternalServerError, "internal error")
+                        return
+                }</span>
+
+                // response
+                <span class="cov8" title="1">response.JSONGin(ctx, http.StatusOK, map[string]any{
+                        "message": "vehicles found",
+                        "data": v,
+                })</span>
+        }
+}
+
+// AverageMaxSpeedByBrand returns a handler that returns the average speed of the vehicles by brand
+func (h *HandlerVehicle) AverageMaxSpeedByBrand() gin.HandlerFunc <span class="cov8" title="1">{
+        return func(ctx *gin.Context) </span><span class="cov8" title="1">{
+                // request
+                brand := ctx.Param("brand")
+
+                // process
+                average, err := h.sv.AverageMaxSpeedByBrand(brand)
+                if err != nil </span><span class="cov8" title="1">{
+                        switch </span>{
+                        case errors.Is(err, internal.ErrServiceNoVehicles):<span class="cov8" title="1">
+                                response.ErrorGin(ctx, http.StatusNotFound, "vehicles not found")</span>
+                        default:<span class="cov8" title="1">
+                                response.ErrorGin(ctx, http.StatusInternalServerError, "internal error")</span>
+                        }
+                        <span class="cov8" title="1">return</span>
+                }
+
+                // response
+                <span class="cov8" title="1">response.JSONGin(ctx, http.StatusOK, map[string]any{
+                        "message": "average max speed found",
+                        "data": average,
+                })</span>
+        }
+}
+
+// AverageCapacityByBrand returns a handler that returns the average capacity of the vehicles by brand
+func (h *HandlerVehicle) AverageCapacityByBrand() gin.HandlerFunc <span class="cov8" title="1">{
+        return func(ctx *gin.Context) </span><span class="cov8" title="1">{
+                // request
+                brand := ctx.Param("brand")
+
+                // process
+                average, err := h.sv.AverageCapacityByBrand(brand)
+                if err != nil </span><span class="cov8" title="1">{
+                        switch </span>{
+                        case errors.Is(err, internal.ErrServiceNoVehicles):<span class="cov8" title="1">
+                                response.ErrorGin(ctx, http.StatusNotFound, "vehicles not found")</span>
+                        default:<span class="cov8" title="1">
+                                response.ErrorGin(ctx, http.StatusInternalServerError, "internal error")</span>
+                        }
+                        <span class="cov8" title="1">return</span>
+                }
+
+                // response
+                <span class="cov8" title="1">response.JSONGin(ctx, http.StatusOK, map[string]any{
+                        "message": "average capacity found",
+                        "data": average,
+                })</span>
+        }
+}
+
+// SearchByWeightRange returns a handler that returns a map of vehicles that match the weight range
+func (h *HandlerVehicle) SearchByWeightRange() gin.HandlerFunc <span class="cov8" title="1">{
+        return func(ctx *gin.Context) </span><span class="cov8" title="1">{
+                // request
+                var query internal.SearchQuery
+
+                // check if query exists and decode
+                ok := ctx.Request.URL.Query().Has("weight_min") &amp;&amp; ctx.Request.URL.Query().Has("weight_max")
+                if ok </span><span class="cov8" title="1">{
+                        var err error
+                        query.FromWeight, err = strconv.ParseFloat(ctx.Query("weight_min"), 64)
+                        if err != nil </span><span class="cov0" title="0">{
+                                response.ErrorGin(ctx, http.StatusBadRequest, "invalid weight_min")
+                                return
+                        }</span>
+
+                        <span class="cov8" title="1">query.ToWeight, err = strconv.ParseFloat(ctx.Query("weight_max"), 64)
+                        if err != nil </span><span class="cov0" title="0">{
+                                response.ErrorGin(ctx, http.StatusBadRequest, "invalid weight_max")
+                                return
+                        }</span>
+                }
+
+                // process
+                <span class="cov8" title="1">v, err := h.sv.SearchByWeightRange(query, ok)
+                if err != nil </span><span class="cov8" title="1">{
+                        response.ErrorGin(ctx, http.StatusInternalServerError, "internal error")
+                        return
+                }</span>
+
+                // response
+                <span class="cov8" title="1">response.JSONGin(ctx, http.StatusOK, map[string]any{
+                        "message": "vehicles found",
+                        "data": v,
+                })</span>
+        }
+}</pre>
+		
+		<pre class="file" id="file1" style="display: none">package repository
+
+import (
+        "app/internal"
+
+        "github.com/stretchr/testify/mock"
+)
+
+// MockRepository is a struct that represents a mock repository
+type MockRepository struct {
+        mock.Mock
+}
+
+// FindAll is a method that returns a map of all vehicles
+func (m *MockRepository) FindAll() (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        args := m.Called()
+        return args.Get(0).(map[int]internal.Vehicle), args.Error(1)
+}</span>
+
+// FindByColorAndYear is a method that returns a map of vehicles that match the color and fabrication year
+func (m *MockRepository) FindByColorAndYear(color string, fabricationYear int) (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        args := m.Called(color, fabricationYear)
+        return args.Get(0).(map[int]internal.Vehicle), args.Error(1)
+}</span>
+
+// FindByBrandAndYearRange is a method that returns a map of vehicles that match the brand and a range of fabrication years
+func (m *MockRepository) FindByBrandAndYearRange(brand string, startYear int, endYear int) (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        args := m.Called(brand, startYear, endYear)
+        return args.Get(0).(map[int]internal.Vehicle), args.Error(1)
+}</span>
+
+// FindByBrand is a method that returns a map of vehicles that match the brand
+func (m *MockRepository) FindByBrand(brand string) (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        args := m.Called(brand)
+        return args.Get(0).(map[int]internal.Vehicle), args.Error(1)
+}</span>
+
+// FindByWeightRange is a method that returns a map of vehicles that match a range of weight
+func (m *MockRepository) FindByWeightRange(fromWeight float64, toWeight float64) (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        args := m.Called(fromWeight, toWeight)
+        return args.Get(0).(map[int]internal.Vehicle), args.Error(1)
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package repository
+
+import "app/internal"
+
+// NewRepositoryReadVehicleMap is a function that returns a new instance of RepositoryReadVehicleMap
+func NewRepositoryReadVehicleMap(db map[int]internal.Vehicle) *RepositoryReadVehicleMap <span class="cov8" title="1">{
+        // default db
+        defaultDb := make(map[int]internal.Vehicle)
+        if db != nil </span><span class="cov8" title="1">{
+                defaultDb = db
+        }</span>
+        <span class="cov8" title="1">return &amp;RepositoryReadVehicleMap{db: defaultDb}</span>
+}
+
+// RepositoryReadVehicleMap is a struct that represents a vehicle repository
+type RepositoryReadVehicleMap struct {
+        // db is a map of vehicles
+        db map[int]internal.Vehicle
+}
+
+// FindAll is a method that returns a map of all vehicles
+func (r *RepositoryReadVehicleMap) FindAll() (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        v = make(map[int]internal.Vehicle)
+
+        // copy db
+        for key, value := range r.db </span><span class="cov8" title="1">{
+                v[key] = value
+        }</span>
+
+        <span class="cov8" title="1">return</span>
+}
+
+// FindByColorAndYear is a method that returns a map of vehicles that match the color and fabrication year
+func (r *RepositoryReadVehicleMap) FindByColorAndYear(color string, fabricationYear int) (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        v = make(map[int]internal.Vehicle)
+
+        // filter db
+        for key, value := range r.db </span><span class="cov8" title="1">{
+                if value.Color == color &amp;&amp; value.FabricationYear == fabricationYear </span><span class="cov8" title="1">{
+                        v[key] = value
+                }</span>
+        }
+
+        <span class="cov8" title="1">return</span>
+}
+
+// FindByBrandAndYearRange is a method that returns a map of vehicles that match the brand and a range of fabrication years
+func (r *RepositoryReadVehicleMap) FindByBrandAndYearRange(brand string, startYear int, endYear int) (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        v = make(map[int]internal.Vehicle)
+
+        // filter db
+        for key, value := range r.db </span><span class="cov8" title="1">{
+                if value.Brand == brand &amp;&amp; value.FabricationYear &gt;= startYear &amp;&amp; value.FabricationYear &lt;= endYear </span><span class="cov8" title="1">{
+                        v[key] = value
+                }</span>
+        }
+
+        <span class="cov8" title="1">return</span>
+}
+
+// FindByBrand is a method that returns a map of vehicles that match the brand
+func (r *RepositoryReadVehicleMap) FindByBrand(brand string) (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        v = make(map[int]internal.Vehicle)
+
+        // filter db
+        for key, value := range r.db </span><span class="cov8" title="1">{
+                if value.Brand == brand </span><span class="cov8" title="1">{
+                        v[key] = value
+                }</span>
+        }
+
+        <span class="cov8" title="1">return</span>
+}
+
+// FindByWeightRange is a method that returns a map of vehicles that match the weight range
+func (r *RepositoryReadVehicleMap) FindByWeightRange(fromWeight float64, toWeight float64) (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        v = make(map[int]internal.Vehicle)
+
+        // filter db
+        for key, value := range r.db </span><span class="cov8" title="1">{
+                if value.Weight &gt;= fromWeight &amp;&amp; value.Weight &lt;= toWeight </span><span class="cov8" title="1">{
+                        v[key] = value
+                }</span>
+        }
+
+        <span class="cov8" title="1">return</span>
+}</pre>
+		
+		<pre class="file" id="file3" style="display: none">package service
+
+import (
+        "app/internal"
+
+        "github.com/stretchr/testify/mock"
+)
+
+// MockService is a struct that implements the Service interface
+type MockService struct {
+        mock.Mock
+}
+
+// FindByColorAndYear is a method that returns a map of vehicles that match the color and fabrication year
+func (m *MockService) FindByColorAndYear(color string, fabricationYear int) (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        args := m.Called(color, fabricationYear)
+        return args.Get(0).(map[int]internal.Vehicle), args.Error(1)
+}</span>
+
+// FindByBrandAndYearRange is a method that returns a map of vehicles that match the brand and a range of fabrication years
+func (m *MockService) FindByBrandAndYearRange(brand string, startYear int, endYear int) (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        args := m.Called(brand, startYear, endYear)
+        return args.Get(0).(map[int]internal.Vehicle), args.Error(1)
+}</span>
+
+// AverageMaxSpeedByBrand is a method that returns the average speed of the vehicles by brand
+func (m *MockService) AverageMaxSpeedByBrand(brand string) (a float64, err error) <span class="cov8" title="1">{
+        args := m.Called(brand)
+        return args.Get(0).(float64), args.Error(1)
+}</span>
+
+// AverageCapacityByBrand is a method that returns the average capacity of the vehicles by brand
+func (m *MockService) AverageCapacityByBrand(brand string) (a int, err error) <span class="cov8" title="1">{
+        args := m.Called(brand)
+        return args.Get(0).(int), args.Error(1)
+}</span>
+
+// SearchByWeightRange is a method that returns a map of vehicles that match the weight range
+func (m *MockService) SearchByWeightRange(query internal.SearchQuery, ok bool) (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        args := m.Called(query, ok)
+        return args.Get(0).(map[int]internal.Vehicle), args.Error(1)
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package service
+
+import "app/internal"
+
+// ServiceVehicleDefault is a struct that represents the default service for vehicles
+type ServiceVehicleDefault struct {
+        // rp is the repository that will be used by the service
+        rp internal.RepositoryReadVehicle
+}
+
+// NewServiceVehicleDefault is a function that returns a new instance of ServiceVehicleDefault
+func NewServiceVehicleDefault(rp internal.RepositoryReadVehicle) *ServiceVehicleDefault <span class="cov8" title="1">{
+        return &amp;ServiceVehicleDefault{rp: rp}
+}</span>
+
+// FindByColorAndYear is a method that returns a map of vehicles that match the color and fabrication year
+func (s *ServiceVehicleDefault) FindByColorAndYear(color string, fabricationYear int) (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        v, err = s.rp.FindByColorAndYear(color, fabricationYear)
+        return
+}</span>
+
+// FindByBrandAndYearRange is a method that returns a map of vehicles that match the brand and a range of fabrication years
+func (s *ServiceVehicleDefault) FindByBrandAndYearRange(brand string, startYear int, endYear int) (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        v, err = s.rp.FindByBrandAndYearRange(brand, startYear, endYear)
+        return
+}</span>
+
+// AverageMaxSpeedByBrand is a method that returns the average speed of the vehicles by brand
+func (s *ServiceVehicleDefault) AverageMaxSpeedByBrand(brand string) (a float64, err error) <span class="cov8" title="1">{
+        // get vehicles by brand
+        v, err := s.rp.FindByBrand(brand)
+        if err != nil </span><span class="cov8" title="1">{
+                return
+        }</span>
+
+        // check if there are vehicles
+        <span class="cov8" title="1">if len(v) == 0 </span><span class="cov8" title="1">{
+                err = internal.ErrServiceNoVehicles
+                return
+        }</span>
+
+        <span class="cov8" title="1">var totalSpeed float64
+        for _, vehicle := range v </span><span class="cov8" title="1">{
+                totalSpeed += vehicle.MaxSpeed
+        }</span>
+
+        <span class="cov8" title="1">a = totalSpeed / float64(len(v))
+        return</span>
+}
+                
+// AverageCapacityByBrand is a method that returns the average capacity of the vehicles by brand
+func (s *ServiceVehicleDefault) AverageCapacityByBrand(brand string) (a int, err error) <span class="cov8" title="1">{
+        // get vehicles by brand
+        v, err := s.rp.FindByBrand(brand)
+        if err != nil </span><span class="cov8" title="1">{
+                return
+        }</span>
+        
+        // check if there are vehicles
+        <span class="cov8" title="1">if len(v) == 0 </span><span class="cov8" title="1">{
+                err = internal.ErrServiceNoVehicles
+                return
+        }</span>
+
+        <span class="cov8" title="1">var totalCapacity int
+        for _, vehicle := range v </span><span class="cov8" title="1">{
+                totalCapacity += vehicle.Capacity
+        }</span>
+
+        <span class="cov8" title="1">a = totalCapacity / len(v)
+        return</span>
+}
+
+// SearchByWeightRange
+func (s *ServiceVehicleDefault) SearchByWeightRange(query internal.SearchQuery, ok bool) (v map[int]internal.Vehicle, err error) <span class="cov8" title="1">{
+        // check if query is set
+        if !ok </span><span class="cov8" title="1">{
+                v, err = s.rp.FindAll()
+                return
+        }</span>
+
+        <span class="cov8" title="1">v, err = s.rp.FindByWeightRange(query.FromWeight, query.ToWeight)
+        return</span>
+}
+        </pre>
+		
+		<pre class="file" id="file5" style="display: none">package request
+
+import (
+        "encoding/json"
+        "errors"
+        "fmt"
+        "net/http"
+)
+
+// JSON decodes json from request body to ptr
+var (
+        // ErrRequestContentTypeNotJSON is used when the request content type is not application/json.
+        ErrRequestContentTypeNotJSON = errors.New("request content type is not application/json")
+        // ErrRequestJSONInvalid is used when the request json is invalid.
+        ErrRequestJSONInvalid = errors.New("request json invalid")
+)
+
+// JSON decodes json from request body to ptr
+func JSON(r *http.Request, ptr any) (err error) <span class="cov8" title="1">{
+        // check content type
+        if r.Header.Get("Content-Type") != "application/json" </span><span class="cov8" title="1">{
+                err = ErrRequestContentTypeNotJSON
+                return
+        }</span>
+
+        // get body
+        <span class="cov8" title="1">err = json.NewDecoder(r.Body).Decode(ptr)
+        if err != nil </span><span class="cov8" title="1">{
+                err = fmt.Errorf("%w. %v", ErrRequestJSONInvalid, err)
+                return
+        }</span>
+
+        <span class="cov8" title="1">return</span>
+}</pre>
+		
+		<pre class="file" id="file6" style="display: none">package response
+
+import (
+        "encoding/json"
+        "fmt"
+        "net/http"
+)
+
+type errorResponse struct {
+        Status  string `json:"status"`
+        Message string `json:"message"`
+}
+
+func Error(w http.ResponseWriter, statusCode int, message string) <span class="cov0" title="0">{
+        // default status code
+        defaultStatusCode := http.StatusInternalServerError
+        // check if status code is valid
+        if statusCode &gt; 299 &amp;&amp; statusCode &lt; 600 </span><span class="cov0" title="0">{
+                defaultStatusCode = statusCode
+        }</span>
+
+        // response
+        <span class="cov0" title="0">body := errorResponse{
+                Status:  http.StatusText(defaultStatusCode),
+                Message: message,
+        }
+        bytes, err := json.Marshal(body)
+        if err != nil </span><span class="cov0" title="0">{
+                w.WriteHeader(http.StatusInternalServerError)
+                return
+        }</span>
+
+        // write response
+        <span class="cov0" title="0">w.WriteHeader(defaultStatusCode)
+        w.Header().Set("Content-Type", "application/json")
+        w.Write(bytes)</span>
+}
+
+func Errorf(w http.ResponseWriter, statusCode int, format string, args ...interface{}) <span class="cov0" title="0">{
+        message := fmt.Sprintf(format, args...)
+        Error(w, statusCode, message)
+}</pre>
+		
+		<pre class="file" id="file7" style="display: none">package response
+
+import (
+        "encoding/json"
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+)
+
+func ErrorGin(ctx *gin.Context, statusCode int, message string) <span class="cov8" title="1">{
+        // default status code
+        defaultStatusCode := http.StatusInternalServerError
+        // check if status code is valid
+        if statusCode &gt; 299 &amp;&amp; statusCode &lt; 600 </span><span class="cov8" title="1">{
+                defaultStatusCode = statusCode
+        }</span>
+
+        // response
+        <span class="cov8" title="1">body := errorResponse{
+                Status:  http.StatusText(defaultStatusCode),
+                Message: message,
+        }
+        bytes, err := json.Marshal(body)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Status(http.StatusInternalServerError)
+                return
+        }</span>
+
+        // write response
+        <span class="cov8" title="1">ctx.Status(defaultStatusCode)
+        ctx.Header("Content-Type", "application/json")
+        ctx.Writer.Write(bytes)</span>
+}</pre>
+		
+		<pre class="file" id="file8" style="display: none">package response
+
+import (
+        "encoding/json"
+        "net/http"
+)
+
+// JSON writes json response
+func JSON(w http.ResponseWriter, code int, body any) <span class="cov8" title="1">{
+        // check body
+        if body == nil </span><span class="cov8" title="1">{
+                w.WriteHeader(code)
+                return
+        }</span>
+        
+        // marshal body
+        <span class="cov8" title="1">bytes, err := json.Marshal(body)
+        if err != nil </span><span class="cov8" title="1">{
+                // default error
+                w.WriteHeader(http.StatusInternalServerError)
+                return
+        }</span>
+
+        // set header
+        <span class="cov8" title="1">w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+        // set status code
+        w.WriteHeader(code)
+
+        // write body
+        w.Write(bytes)</span>
+}</pre>
+		
+		<pre class="file" id="file9" style="display: none">package response
+
+import (
+        "encoding/json"
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+)
+
+func JSONGin(ctx *gin.Context, code int, body any) <span class="cov8" title="1">{
+        // check body
+        if body == nil </span><span class="cov0" title="0">{
+                ctx.Status(code)
+                return
+        }</span>
+
+        // marshal body
+        <span class="cov8" title="1">bytes, err := json.Marshal(body)
+        if err != nil </span><span class="cov0" title="0">{
+                // default error
+                ctx.Status(http.StatusInternalServerError)
+                return
+        }</span>
+
+        // set header
+        <span class="cov8" title="1">ctx.Header("Content-Type", "application/json")
+
+        // set status code
+        ctx.Status(code)
+
+        // write body
+        ctx.Writer.Write(bytes)</span>
+}</pre>
+		
+		<pre class="file" id="file10" style="display: none">package response
+
+import "net/http"
+
+// Text writes text response
+func Text(w http.ResponseWriter, code int, body string) <span class="cov8" title="1">{
+        // set header
+        w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+
+        // set status code
+        w.WriteHeader(code)
+
+        // write body
+        w.Write([]byte(body))
+}</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
